@@ -2,8 +2,13 @@ module Api
   module V1
     class SessionsController < Devise::SessionsController
       respond_to :html, :json
+      skip_before_action :verify_authenticity_token, if: :json_request?
 
       private
+
+      def json_request?
+        request.format.json?
+      end
 
       def respond_with(resource, _opts = {})
         return super unless request.format.json?

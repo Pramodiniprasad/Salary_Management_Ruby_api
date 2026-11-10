@@ -3,12 +3,18 @@ module Api
     class SalarySlipsController < BaseController
       def index
         authorize SalarySlip, :index?
-        salary_slips = policy_scope(SalarySlip).order(year: :desc, month: :desc)
-        render json: { data: salary_slips.map { |slip| SalarySlipSerializer.new(slip).as_json } }
+        page, per_page = pagination_parameters
+        return if performed?
+
+        salary_slips = policy_scope(SalarySlip).includes(:organization)
+        salary_slips = salary_slips.where(month: params[:month]) if params[:month].present?
+        salary_slips = salary_slips.where(year: params[:year]) if params[:year].present?
+        salary_slips = salary_slips.order(year: :desc, month: :desc, id: :desc)
+        paginated_response(salary_slips, page: page, per_page: per_page, serializer: SalarySlipSerializer)
       end
 
       def show
-        @salary_slip = policy_scope(SalarySlip).find(params[:id])
+        @salary_slip = policy_scope(SalarySlip).includes(:organization).find(params[:id])
         authorize @salary_slip, :show?
         render json: { data: SalarySlipSerializer.new(@salary_slip).as_json }
       end

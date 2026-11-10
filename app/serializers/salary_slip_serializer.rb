@@ -8,6 +8,7 @@ class SalarySlipSerializer
       id: @salary_slip.id,
       employee_id: @salary_slip.employee_id,
       salary_id: @salary_slip.salary_id,
+      organization: { name: @salary_slip.organization.name },
       month: @salary_slip.month,
       year: @salary_slip.year,
       basic_salary: @salary_slip.basic_salary,

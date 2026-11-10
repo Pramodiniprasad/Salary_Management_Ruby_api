@@ -1,0 +1,14 @@
+<h3>Edit administrator for <%= @organization.name %></h3>
+
+<%= active_admin_form_for(@user,
+                          url: edit_admin_admin_organization_path(@organization, user_id: @user.id),
+                          method: :patch) do |form|
+  form.inputs do
+    form.input :name
+    form.input :email
+    form.input :status, as: :select, collection: User.statuses.keys
+    form.input :password, required: false, hint: "Leave blank to keep the current password."
+    form.input :password_confirmation, required: false
+  end
+  form.actions
+end %>

@@ -3,8 +3,11 @@ module Api
     class SalariesController < BaseController
       def index
         authorize Salary, :index?
+        page, per_page = pagination_parameters
+        return if performed?
+
         salaries = policy_scope(Salary).order(:id)
-        render json: { data: salaries.map { |salary| SalarySerializer.new(salary).as_json } }
+        paginated_response(salaries, page: page, per_page: per_page, serializer: SalarySerializer)
       end
 
       def show

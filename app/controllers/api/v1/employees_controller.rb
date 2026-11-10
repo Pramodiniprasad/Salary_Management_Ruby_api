@@ -33,7 +33,11 @@ module Api
         @employee = policy_scope(Employee).find(params[:id])
         authorize @employee, :update?
 
-        if @employee.update(employee_update_params)
+        attributes = employee_update_params
+        if invalid_employment_status?(attributes)
+          @employee.errors.add(:employment_status, :inclusion)
+          render_validation_errors(@employee)
+        elsif @employee.update(attributes)
           render json: { data: EmployeeSerializer.new(@employee).as_json }
         else
           render_validation_errors(@employee)
@@ -61,7 +65,15 @@ module Api
       end
 
       def employee_update_params
-        employee_params.except(:user_id)
+        params.require(:employee).permit(
+          :id, :organization_id, :user_id, :employee_code, :first_name, :last_name,
+          :email, :phone, :designation, :department, :date_of_joining, :employment_status
+        ).except(:id, :organization_id, :user_id)
+      end
+
+      def invalid_employment_status?(attributes)
+        status = attributes[:employment_status]
+        status.present? && !Employee.employment_statuses.key?(status)
       end
     end
   end

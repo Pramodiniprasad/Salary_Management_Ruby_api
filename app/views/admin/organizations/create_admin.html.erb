@@ -1,13 +1,13 @@
 <h3>Add an administrator for <%= @organization.name %></h3>
 
-<%= active_admin_form_for @user,
+<%= active_admin_form_for(@user,
                           url: create_admin_admin_organization_path(@organization),
-                          method: :post do |form| %>
-  <%= form.inputs do %>
-    <%= form.input :name %>
-    <%= form.input :email %>
-    <%= form.input :password %>
-    <%= form.input :password_confirmation %>
-  <% end %>
-  <%= form.actions %>
-<% end %>
+                          method: :post) do |form|
+  form.inputs do
+    form.input :name
+    form.input :email
+    form.input :password
+    form.input :password_confirmation
+  end
+  form.actions
+end %>

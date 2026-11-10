@@ -20,7 +20,7 @@
       "request_body": {"user": {"email": "employee@example.com", "password": "password123"}},
       "success_status": 200,
       "response_headers": {"Content-Type": "application/json", "Authorization": "Bearer <jwt>"},
-      "response_body": {"data": {"id": 4, "name": "Example Employee", "email": "employee@example.com", "role": "employee", "status": "active", "organization_id": 2}},
+      "response_body": {"data": {"id": 4, "name": "Example Employee", "email": "employee@example.com", "role": "employee", "status": "active", "organization_id": 2, "organization": {"name": "Incubyte"}}},
       "errors": {"401": {"error": "Invalid email or password."}}
     },
     {
@@ -47,10 +47,30 @@
       "request_body": null,
       "success_status": 200,
       "response_headers": {"Content-Type": "application/json"},
-      "response_body": {"data": {"id": 4, "name": "Example Employee", "email": "employee@example.com", "role": "employee", "status": "active", "organization_id": 2}}
+      "response_body": {"data": {"id": 4, "name": "Example Employee", "email": "employee@example.com", "role": "employee", "status": "active", "organization_id": 2, "organization": {"name": "Incubyte"}}}
     },
     {
       "order": 4,
+      "name": "Update current user profile or password",
+      "method": "PATCH",
+      "path": "/api/v1/me",
+      "roles": ["authenticated (own account only)"],
+      "authentication": true,
+      "request_headers": {"Authorization": "******", "Content-Type": "application/json", "Accept": "application/json"},
+      "request_body": {"user": {"name": "Updated HR Name", "email": "updated.hr@example.com"}},
+      "password_change_request_body": {"user": {"current_password": "current-password", "password": "new-password123", "password_confirmation": "new-password123"}},
+      "success_status": 200,
+      "response_headers": {"Content-Type": "application/json"},
+      "response_body": {"data": {"id": 4, "name": "Updated HR Name", "email": "updated.hr@example.com", "role": "hr", "status": "active", "organization_id": 2, "organization": {"name": "Incubyte"}}},
+      "errors": {
+        "401": {"error": "You need to sign in or sign up before continuing."},
+        "403": {"error": "forbidden"},
+        "422": {"errors": {"current_password": ["is invalid"]}}
+      },
+      "notes": "Only name and email are editable. Role, status, and organization_id are ignored. Password changes require current_password and password_confirmation. Password fields can be omitted for profile-only updates."
+    },
+    {
+      "order": 5,
       "name": "List users",
       "method": "GET",
       "path": "/api/v1/users",
@@ -60,10 +80,10 @@
       "request_body": null,
       "success_status": 200,
       "response_headers": {"Content-Type": "application/json"},
-      "response_body": {"data": [{"id": 4, "name": "Example Employee", "email": "employee@example.com", "role": "employee", "status": "active", "organization_id": 2}]}
+      "response_body": {"data": [{"id": 4, "name": "Example Employee", "email": "employee@example.com", "role": "employee", "status": "active", "organization_id": 2, "organization": {"name": "Incubyte"}}]}
     },
     {
-      "order": 5,
+      "order": 6,
       "name": "Create user",
       "method": "POST",
       "path": "/api/v1/users",
@@ -73,10 +93,10 @@
       "request_body": {"user": {"name": "New Employee", "email": "new.employee@example.com", "password": "password123", "password_confirmation": "password123", "role": "employee"}},
       "success_status": 201,
       "response_headers": {"Content-Type": "application/json"},
-      "response_body": {"data": {"id": 5, "name": "New Employee", "email": "new.employee@example.com", "role": "employee", "status": "active", "organization_id": 2}}
+      "response_body": {"data": {"id": 5, "name": "New Employee", "email": "new.employee@example.com", "role": "employee", "status": "active", "organization_id": 2, "organization": {"name": "Incubyte"}}}
     },
     {
-      "order": 6,
+      "order": 7,
       "name": "List employees",
       "method": "GET",
       "path": "/api/v1/employees",
@@ -89,7 +109,7 @@
       "response_body": {"data": [{"id": 3, "organization_id": 2, "user_id": 5, "employee_code": "EMP-005", "first_name": "New", "last_name": "Employee", "email": "new.employee@example.com", "phone": null, "designation": "Engineer", "department": "Technology", "date_of_joining": "2026-01-15", "employment_status": "active"}]}
     },
     {
-      "order": 7,
+      "order": 8,
       "name": "Show employee",
       "method": "GET",
       "path": "/api/v1/employees/{id}",
@@ -102,7 +122,7 @@
       "response_body": {"data": {"id": 3, "organization_id": 2, "user_id": 5, "employee_code": "EMP-005", "first_name": "New", "last_name": "Employee", "email": "new.employee@example.com", "phone": null, "designation": "Engineer", "department": "Technology", "date_of_joining": "2026-01-15", "employment_status": "active"}}
     },
     {
-      "order": 8,
+      "order": 9,
       "name": "Create employee profile",
       "method": "POST",
       "path": "/api/v1/employees",
@@ -115,20 +135,22 @@
       "response_body": {"data": {"id": 3, "organization_id": 2, "user_id": 5, "employee_code": "EMP-005", "first_name": "New", "last_name": "Employee", "email": "new.employee@example.com", "phone": "555-0101", "designation": "Engineer", "department": "Technology", "date_of_joining": "2026-01-15", "employment_status": "active"}}
     },
     {
-      "order": 9,
+      "order": 10,
       "name": "Update employee profile",
       "method": "PATCH",
       "path": "/api/v1/employees/{id}",
       "roles": ["organization_admin", "hr"],
       "authentication": true,
       "request_headers": {"Authorization": "Bearer <jwt>", "Content-Type": "application/json", "Accept": "application/json"},
-      "request_body": {"employee": {"designation": "Senior Engineer", "department": "Technology"}},
+      "request_body": {"employee": {"designation": "Senior Engineer", "department": "Technology", "employment_status": "on_leave"}},
       "success_status": 200,
       "response_headers": {"Content-Type": "application/json"},
-      "response_body": {"data": {"id": 3, "organization_id": 2, "user_id": 5, "employee_code": "EMP-005", "first_name": "New", "last_name": "Employee", "email": "new.employee@example.com", "phone": "555-0101", "designation": "Senior Engineer", "department": "Technology", "date_of_joining": "2026-01-15", "employment_status": "active"}}
+      "response_body": {"data": {"id": 3, "organization_id": 2, "user_id": 5, "employee_code": "EMP-005", "first_name": "New", "last_name": "Employee", "email": "new.employee@example.com", "phone": "555-0101", "designation": "Senior Engineer", "department": "Technology", "date_of_joining": "2026-01-15", "employment_status": "on_leave"}},
+      "errors": {"422": {"errors": {"employment_status": ["is not included in the list"]}}},
+      "notes": "Allowed employment_status values: active, on_leave, terminated. id, organization_id, and user_id are read-only and ignored during updates."
     },
     {
-      "order": 10,
+      "order": 11,
       "name": "Delete employee profile",
       "method": "DELETE",
       "path": "/api/v1/employees/{id}",
@@ -141,20 +163,21 @@
       "response_body": null
     },
     {
-      "order": 11,
+      "order": 12,
       "name": "List salaries",
       "method": "GET",
       "path": "/api/v1/salaries",
+      "query_parameters": {"page": "optional, defaults to 1", "per_page": "optional, defaults to 50, maximum 100"},
       "roles": ["organization_admin", "hr", "employee (own records only)"],
       "authentication": true,
       "request_headers": {"Authorization": "Bearer <jwt>", "Accept": "application/json"},
       "request_body": null,
       "success_status": 200,
       "response_headers": {"Content-Type": "application/json"},
-      "response_body": {"data": [{"id": 1, "employee_id": 3, "basic_salary": "5000.00", "hra": "1000.00", "allowances": "250.00", "deductions": "400.00", "gross_salary": "6250.00", "net_salary": "5850.00", "effective_from": "2026-01-01", "effective_to": null}]}
+      "response_body": {"data": [{"id": 1, "employee_id": 3, "basic_salary": "5000.00", "hra": "1000.00", "allowances": "250.00", "deductions": "400.00", "gross_salary": "6250.00", "net_salary": "5850.00", "effective_from": "2026-01-01", "effective_to": null}], "meta": {"page": 1, "per_page": 50, "next_page": null}}
     },
     {
-      "order": 12,
+      "order": 13,
       "name": "Show salary",
       "method": "GET",
       "path": "/api/v1/salaries/{id}",
@@ -167,7 +190,7 @@
       "response_body": {"data": {"id": 1, "employee_id": 3, "basic_salary": "5000.00", "hra": "1000.00", "allowances": "250.00", "deductions": "400.00", "gross_salary": "6250.00", "net_salary": "5850.00", "effective_from": "2026-01-01", "effective_to": null}}
     },
     {
-      "order": 13,
+      "order": 14,
       "name": "Create salary",
       "method": "POST",
       "path": "/api/v1/salaries",
@@ -180,7 +203,7 @@
       "response_body": {"data": {"id": 1, "employee_id": 3, "basic_salary": "5000.00", "hra": "1000.00", "allowances": "250.00", "deductions": "400.00", "gross_salary": "6250.00", "net_salary": "5850.00", "effective_from": "2026-01-01", "effective_to": null}}
     },
     {
-      "order": 14,
+      "order": 15,
       "name": "Update salary",
       "method": "PATCH",
       "path": "/api/v1/salaries/{id}",
@@ -193,7 +216,7 @@
       "response_body": {"data": {"id": 1, "employee_id": 3, "basic_salary": "5200.00", "hra": "1100.00", "allowances": "250.00", "deductions": "450.00", "gross_salary": "6550.00", "net_salary": "6100.00", "effective_from": "2026-01-01", "effective_to": null}}
     },
     {
-      "order": 15,
+      "order": 16,
       "name": "Delete salary",
       "method": "DELETE",
       "path": "/api/v1/salaries/{id}",
@@ -206,20 +229,22 @@
       "response_body": null
     },
     {
-      "order": 16,
+      "order": 17,
       "name": "List salary slips",
       "method": "GET",
       "path": "/api/v1/salary_slips",
+      "query_parameters": {"page": "optional, defaults to 1", "per_page": "optional, defaults to 50, maximum 100", "month": "optional 1-12", "year": "optional four-digit year"},
       "roles": ["organization_admin", "hr", "employee (own records only)"],
       "authentication": true,
       "request_headers": {"Authorization": "Bearer <jwt>", "Accept": "application/json"},
       "request_body": null,
       "success_status": 200,
       "response_headers": {"Content-Type": "application/json"},
-      "response_body": {"data": [{"id": 1, "employee_id": 3, "salary_id": 1, "month": 1, "year": 2026, "basic_salary": "5000.00", "total_earnings": "6250.00", "total_deductions": "400.00", "net_salary": "5850.00", "payment_status": "pending", "payment_date": null}]}
+      "response_body": {"data": [{"id": 1, "employee_id": 3, "salary_id": 1, "organization": {"name": "Incubyte"}, "month": 11, "year": 2026, "basic_salary": "5000.00", "total_earnings": "6250.00", "total_deductions": "400.00", "net_salary": "5850.00", "payment_status": "pending", "payment_date": null}], "meta": {"page": 1, "per_page": 50, "next_page": null}},
+      "examples": [{"request": "GET /api/v1/salary_slips?month=11&year=2026", "description": "Return November 2026 slips only."}]
     },
     {
-      "order": 17,
+      "order": 18,
       "name": "Show salary slip",
       "method": "GET",
       "path": "/api/v1/salary_slips/{id}",
@@ -229,10 +254,10 @@
       "request_body": null,
       "success_status": 200,
       "response_headers": {"Content-Type": "application/json"},
-      "response_body": {"data": {"id": 1, "employee_id": 3, "salary_id": 1, "month": 1, "year": 2026, "basic_salary": "5000.00", "total_earnings": "6250.00", "total_deductions": "400.00", "net_salary": "5850.00", "payment_status": "pending", "payment_date": null}}
+      "response_body": {"data": {"id": 1, "employee_id": 3, "salary_id": 1, "organization": {"name": "Incubyte"}, "month": 1, "year": 2026, "basic_salary": "5000.00", "total_earnings": "6250.00", "total_deductions": "400.00", "net_salary": "5850.00", "payment_status": "pending", "payment_date": null}}
     },
     {
-      "order": 18,
+      "order": 19,
       "name": "Create salary slip",
       "method": "POST",
       "path": "/api/v1/salary_slips",
@@ -242,10 +267,10 @@
       "request_body": {"salary_slip": {"salary_id": 1, "month": 1, "year": 2026}},
       "success_status": 201,
       "response_headers": {"Content-Type": "application/json"},
-      "response_body": {"data": {"id": 1, "employee_id": 3, "salary_id": 1, "month": 1, "year": 2026, "basic_salary": "5000.00", "total_earnings": "6250.00", "total_deductions": "400.00", "net_salary": "5850.00", "payment_status": "pending", "payment_date": null}}
+      "response_body": {"data": {"id": 1, "employee_id": 3, "salary_id": 1, "organization": {"name": "Incubyte"}, "month": 1, "year": 2026, "basic_salary": "5000.00", "total_earnings": "6250.00", "total_deductions": "400.00", "net_salary": "5850.00", "payment_status": "pending", "payment_date": null}}
     },
     {
-      "order": 19,
+      "order": 20,
       "name": "Update salary slip payment",
       "method": "PATCH",
       "path": "/api/v1/salary_slips/{id}",
@@ -255,7 +280,7 @@
       "request_body": {"salary_slip": {"payment_status": "paid", "payment_date": "2026-02-01"}},
       "success_status": 200,
       "response_headers": {"Content-Type": "application/json"},
-      "response_body": {"data": {"id": 1, "employee_id": 3, "salary_id": 1, "month": 1, "year": 2026, "basic_salary": "5000.00", "total_earnings": "6250.00", "total_deductions": "400.00", "net_salary": "5850.00", "payment_status": "paid", "payment_date": "2026-02-01"}}
+      "response_body": {"data": {"id": 1, "employee_id": 3, "salary_id": 1, "organization": {"name": "Incubyte"}, "month": 1, "year": 2026, "basic_salary": "5000.00", "total_earnings": "6250.00", "total_deductions": "400.00", "net_salary": "5850.00", "payment_status": "paid", "payment_date": "2026-02-01"}}
     }
   ],
   "common_errors": {

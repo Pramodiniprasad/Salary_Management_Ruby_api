@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_09_184623) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_10_225000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -91,6 +91,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_09_184623) do
     t.datetime "updated_at", null: false
     t.index ["employee_id", "year", "month"], name: "index_salary_slips_on_employee_id_and_year_and_month", unique: true
     t.index ["employee_id"], name: "index_salary_slips_on_employee_id"
+    t.index ["organization_id", "year", "month", "id"], name: "index_salary_slips_on_organization_and_period", order: { year: :desc, month: :desc, id: :desc }
     t.index ["organization_id"], name: "index_salary_slips_on_organization_id"
     t.index ["salary_id"], name: "index_salary_slips_on_salary_id"
   end

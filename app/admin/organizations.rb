@@ -24,6 +24,28 @@ ActiveAdmin.register Organization do
     end
   end
 
+  member_action :edit_admin, method: [ :get, :patch ] do
+    @organization = resource
+    @user = @organization.users.organization_admin.find(params[:user_id])
+
+    if request.patch?
+      attributes = params.require(:user).permit(:name, :email, :status, :password, :password_confirmation)
+      attributes.delete(:password) if attributes[:password].blank?
+      attributes.delete(:password_confirmation) if attributes[:password_confirmation].blank?
+      if attributes[:password].present? && attributes[:password_confirmation].blank?
+        @user.errors.add(:password_confirmation, :blank)
+      end
+
+      if @user.errors.any? || !@user.update(attributes)
+        render "admin/organizations/edit_admin", status: :unprocessable_entity
+      else
+        redirect_to resource_path, notice: "Organization admin updated."
+      end
+    else
+      render "admin/organizations/edit_admin"
+    end
+  end
+
   index do
     selectable_column
     id_column
@@ -47,6 +69,17 @@ ActiveAdmin.register Organization do
       row :phone
       row :status
       row("Users") { resource.user_count }
+    end
+
+    panel "Organization administrators" do
+      table_for resource.users.organization_admin do
+        column :name
+        column :email
+        column :status
+        column("Actions") do |user|
+          link_to "Edit", edit_admin_admin_organization_path(resource, user_id: user.id)
+        end
+      end
     end
   end
 

@@ -10,6 +10,10 @@ class UserPolicy < ApplicationPolicy
       record.organization_id == user.organization_id
   end
 
+  def update?
+    record == user
+  end
+
   def create?
     return false unless record.organization_id == user.organization_id
 

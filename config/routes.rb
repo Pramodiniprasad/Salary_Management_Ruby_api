@@ -15,6 +15,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       get "me", to: "users#show"
+      patch "me", to: "users#update"
       resources :users, only: [ :index, :create ]
       resources :employees, only: [ :index, :show, :create, :update, :destroy ]
       resources :salaries, only: [ :index, :show, :create, :update, :destroy ]
@@ -23,10 +24,6 @@ Rails.application.routes.draw do
   end
 
   get "up" => "rails/health#show", as: :rails_health_check
-
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   root to: redirect("/admin")
 end

@@ -30,6 +30,37 @@ module Api
       def render_validation_errors(record)
         render json: { errors: record.errors.to_hash }, status: :unprocessable_entity
       end
+
+      def pagination_parameters
+        page = Integer(params.fetch(:page, 1).to_s, 10)
+        per_page = Integer(params.fetch(:per_page, 50).to_s, 10)
+
+        unless page.between?(1, 1_000_000) && per_page.between?(1, 100)
+          raise ArgumentError
+        end
+
+        [ page, per_page ]
+      rescue ArgumentError
+        render json: {
+          error: "bad_request",
+          details: "page must be between 1 and 1000000; per_page must be between 1 and 100."
+        }, status: :bad_request
+      end
+
+      def paginated_response(scope, page:, per_page:, serializer:)
+        records = scope.offset((page - 1) * per_page).limit(per_page + 1).to_a
+        has_next_page = records.length > per_page
+        records = records.first(per_page)
+
+        render json: {
+          data: records.map { |record| serializer.new(record).as_json },
+          meta: {
+            page: page,
+            per_page: per_page,
+            next_page: has_next_page ? page + 1 : nil
+          }
+        }
+      end
     end
   end
 end
