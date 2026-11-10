@@ -12,8 +12,12 @@ unless admin_credentials&.password.present?
   raise "Configure super_admin.password with `bin/rails credentials:edit`."
 end
 
-super_admin = User.find_or_initialize_by(email: "admin@gmail.com")
+super_admin_email = admin_credentials.email.presence || "admin@gmail.com"
+super_admin = User.find_by(email: super_admin_email)
+super_admin ||= User.find_by(email: "admin@gmail.com", role: :super_admin)
+super_admin ||= User.new
 super_admin.assign_attributes(
+  email: super_admin_email,
   name: admin_credentials.name.presence || "Super Admin",
   password: admin_credentials.password,
   role: :super_admin,
